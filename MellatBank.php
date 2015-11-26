@@ -8,17 +8,17 @@ use yii\widgets\ActiveForm;
 use yii\web\NotFoundHttpException;
 
 class MellatBank extends \yii\base\Widget {
-
+    
     /**
      * @var array options 
      */
     public $options = [];
-
+    
     /**
      * @var integer amount
      */
     public $amount;
-
+    
     /**
      * Run widget
      * @return string
@@ -27,12 +27,12 @@ class MellatBank extends \yii\base\Widget {
         ActiveForm::begin(['action' => $this->options['url']]);
         echo Html::hiddenInput('MellatBank[payment]', 1);
         if(isset($this->amount) && $this->amount > 100) echo Html::hiddenInput('MellatBank[amount]', $this->amount);
-        echo Html::submitButton(isset($this->options['title']) ? $this->options['title'] : 'Ù¾Ø±Ø¯Ø§Ø®Øª', ['class' => isset($this->options['buttonClass']) ? $this->options['buttonClass'] : 'btn btn-success']);
+        echo Html::submitButton(isset($this->options['title']) ? $this->options['title'] : 'ÑÏÇÎÊ', ['class' => isset($this->options['buttonClass']) ? $this->options['buttonClass'] : 'btn btn-success']);
         ActiveForm::end();
-
+        
         return;
     }
-
+    
     /**
      * Start new payment
      * By this method you can start a new payment like this:
@@ -58,7 +58,7 @@ class MellatBank extends \yii\base\Widget {
             echo '<h2>Constructor error</h2><pre>' . $err . '</pre>';
             die();
         }
-
+        
         $parameters = [
             'terminalId' => $config['terminal'],
             'userName' => $config['username'],
@@ -71,14 +71,14 @@ class MellatBank extends \yii\base\Widget {
             'callBackUrl' => Url::to($config['callBackUrl'], TRUE),
             'payerId' => 0
         ];
-
+        
         // save parameters in session
         $session = \Yii::$app->getSession();
         $session['mellatbank'] = $parameters;
-
+        
         // send request to bank
         $result = $client->call('bpPayRequest', $parameters, 'http://interfaces.core.sw.bps.com/');
-
+        
         if ($client->fault) {
             echo '<h2>Fault</h2><pre>';
             print_r($result);
@@ -146,7 +146,7 @@ class MellatBank extends \yii\base\Widget {
                 echo '<h2>Error</h2><pre>' . $err . '</pre>';
                 die();
             } else {
-                if ($resultStr === '0' || $resultStr === 43) {
+                if ($resultStr == '0' || $resultStr == 43) {
                     return true;
                 }
             }
@@ -197,7 +197,7 @@ class MellatBank extends \yii\base\Widget {
                 echo '<h2>Error</h2><pre>' . $err . '</pre>';
                 die();
             } else {
-                if ($resultStr === '0' || $resultStr === 45) {
+                if ($resultStr == '0' || $resultStr == 45) {
                     return true;
                 }
             }
@@ -231,9 +231,9 @@ class MellatBank extends \yii\base\Widget {
     public function checkPayment(array $config, array $params)
     {
         $session = \Yii::$app->getSession();
-        if ($params["ResCode"] === 0 && $config['amount'] === $session['mellatbank']['amount']) {
-            if ($this->verifyPayment($config, $params) === true) {
-                if ($this->settlePayment($config, $params) === true) {
+        if ($params["ResCode"] == 0 && $config['amount'] == $session['mellatbank']['amount']) {
+            if ($this->verifyPayment($config, $params) == true) {
+                if ($this->settlePayment($config, $params) == true) {
                     return array(
                         "status" => "success",
                         "trans" => $params["SaleReferenceId"]
@@ -243,7 +243,7 @@ class MellatBank extends \yii\base\Widget {
         }
         return null;
     }
-
+    
     /**
      * create a form and submit
      * @param hash $refIdValue
@@ -266,7 +266,7 @@ class MellatBank extends \yii\base\Widget {
         postRefId("' . $refIdValue . '");
         </script>';
     }
-
+    
     /**
      * Show bank error
      * 
@@ -277,21 +277,21 @@ class MellatBank extends \yii\base\Widget {
     {
         $err = 'Error code : ' . $number;
         switch ($number) {
-            case 31     : $err = "Ù¾Ø§Ø³Ø® Ù†Ø§Ù…Ø¹ØªØ¨Ø± Ø§Ø³Øª!";                       break;
-            case 17     : $err = "Ú©Ø§Ø±Ø¨Ø± Ø§Ø² Ø§Ù†Ø¬Ø§Ù… ØªØ±Ø§Ú©Ù†Ø´ Ù…Ù†ØµØ±Ù Ø´Ø¯Ù‡ Ø§Ø³Øª!";    break;
-            case 21     : $err = "Ù¾Ø°ÛŒØ±Ù†Ø¯Ù‡ Ù†Ø§Ù…Ø¹ØªØ¨Ø± Ø§Ø³Øª!";                    break;
-            case 25     : $err = "Ù…Ø¨Ù„Øº Ù†Ø§Ù…Ø¹ØªØ¨Ø± Ø§Ø³Øª!";                       break;
-            case 34     : $err = "Ø®Ø·Ø§ÛŒ Ø³ÛŒØ³ØªÙ…ÛŒ!";                            break;
-            case 41     : $err = "Ø´Ù…Ø§Ø±Ù‡ Ø¯Ø±Ø®ÙˆØ§Ø³Øª ØªÚ©Ø±Ø§Ø±ÛŒ Ø§Ø³Øª!";               break;
-            case 421    : $err = "Ø§ÛŒ Ù¾ÛŒ Ù†Ø§Ù…Ø¹ØªØ¨Ø± Ø§Ø³Øª!";                      break;
-            case 412    : $err = "Ø´Ù†Ø§Ø³Ù‡ Ù‚Ø¨Ø¶ Ù†Ø§Ø¯Ø±Ø³Øª Ø§Ø³Øª!";                   break;
-            case 45     : $err = "ØªØ±Ø§Ú©Ù†Ø´ Ø§Ø² Ù‚Ø¨Ù„ Ø³ØªÙ„ Ø´Ø¯Ù‡ Ø§Ø³Øª";               break;
-            case 46     : $err = "ØªØ±Ø§Ú©Ù†Ø´ Ø³ØªÙ„ Ø´Ø¯Ù‡ Ø§Ø³Øª";                      break;
-            case 35     : $err = "ØªØ§Ø±ÛŒØ® Ù†Ø§Ù…Ø¹ØªØ¨Ø± Ø§Ø³Øª";                       break;
-            case 32     : $err = "ÙØ±Ù…Øª Ø§Ø·Ù„Ø§Ø¹Ø§Øª ÙˆØ§Ø±Ø¯ Ø´Ø¯Ù‡ ØµØ­ÛŒØ­ Ù†Ù…ÛŒØ¨Ø§Ø´Ø¯";       break;
-            case 43     : $err = "Ø¯Ø±Ø®ÙˆØ§Ø³Øª verify Ù‚Ø¨Ù„Ø§ ØµØ§Ø¯Ø± Ø´Ø¯Ù‡ Ø§Ø³Øª";         break;
+            case 31     : $err = "ÇÓÎ äÇãÚÊÈÑ ÇÓÊ!";                       break;
+            case 17     : $err = "˜ÇÑÈÑ ÇÒ ÇäÌÇã ÊÑÇ˜äÔ ãäÕÑİ ÔÏå ÇÓÊ!";    break;
+            case 21     : $err = "Ğ?ÑäÏå äÇãÚÊÈÑ ÇÓÊ!";                    break;
+            case 25     : $err = "ãÈáÛ äÇãÚÊÈÑ ÇÓÊ!";                       break;
+            case 34     : $err = "ÎØÇ? Ó?ÓÊã?!";                            break;
+            case 41     : $err = "ÔãÇÑå ÏÑÎæÇÓÊ Ê˜ÑÇÑ? ÇÓÊ!";               break;
+            case 421    : $err = "Ç? ? äÇãÚÊÈÑ ÇÓÊ!";                      break;
+            case 412    : $err = "ÔäÇÓå ŞÈÖ äÇÏÑÓÊ ÇÓÊ!";                   break;
+            case 45     : $err = "ÊÑÇ˜äÔ ÇÒ ŞÈá ÓÊá ÔÏå ÇÓÊ";               break;
+            case 46     : $err = "ÊÑÇ˜äÔ ÓÊá ÔÏå ÇÓÊ";                      break;
+            case 35     : $err = "ÊÇÑ?Î äÇãÚÊÈÑ ÇÓÊ";                       break;
+            case 32     : $err = "İÑãÊ ÇØáÇÚÇÊ æÇÑÏ ÔÏå ÕÍ?Í äã?ÈÇÔÏ";       break;
+            case 43     : $err = "ÏÑÎæÇÓÊ verify ŞÈáÇ ÕÇÏÑ ÔÏå ÇÓÊ";         break;
         }
         throw new NotFoundHttpException($err);
     }
-
+    
 }
