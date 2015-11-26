@@ -32,7 +32,8 @@ Once the extension is installed, for show payment button use like this  :
     'options' => [
         'url' => ['/site/pay'], // url to send post data
     ]
-]); ?>```
+]); ?>
+```
 
 for payment in controller SiteController/actionPay use like this :
 
