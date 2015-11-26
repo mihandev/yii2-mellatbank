@@ -146,7 +146,7 @@ class MellatBank extends \yii\base\Widget {
                 echo '<h2>Error</h2><pre>' . $err . '</pre>';
                 die();
             } else {
-                if ($resultStr === '0') {
+                if ($resultStr === '0' || $resultStr === 43) {
                     return true;
                 }
             }
@@ -197,7 +197,7 @@ class MellatBank extends \yii\base\Widget {
                 echo '<h2>Error</h2><pre>' . $err . '</pre>';
                 die();
             } else {
-                if ($resultStr === '0') {
+                if ($resultStr === '0' || $resultStr === 45) {
                     return true;
                 }
             }
