@@ -1,0 +1,22 @@
+{
+    "name": "mihandev/yii2-mellatbank",
+    "description": "you can use this library for bank mellat gateway payments.",
+    "type": "library",
+    "keywords": ["yii2","extension","bank mellat","gateway"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ahmad Rezaee",
+            "email": "parsarezaei53@gmail.com"
+        }
+    ],
+    "require": {
+        "yiisoft/yii2": "*",
+        "fergusean/nusoap": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "mihandev\\gateway\\": ""
+        }
+    }
+}
